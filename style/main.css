@@ -1,3 +1,112 @@
+#loading{
+	width: 100%;
+	height: 100%;
+	background-image: url(../images/loadingBg.jpg);
+	background-size: 100% auto;
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+
+#loadingProgress{
+	position: absolute;
+	width: 100%;
+	top: 40%;
+	color: #ffffff;
+	font-size: 2rem;
+	text-align: center;
+
+}
+
+#tip{
+	position: absolute;
+	width: 100%;
+	top: 35%;
+	left:48% ;
+	color: #ffffff;
+	font-size: 1rem;
+	text-align: center;
+	writing-mode: vertical-lr;
+	display: none;
+}
+
+.upTip{
+	animation: 3s upTip infinite;
+}
+
+@keyframes upTip {
+	0%{
+		transform: translate(0,0);
+		opacity: 0.6;
+	}
+	100%{
+		transform: translate(0,-20px);
+		opacity:1;
+	}
+}
+
 #stage canvas{
+	width: 100%;
+}
+
+#audioBix{
+	display: none;
+}
+
+#musicIcon{
+	height: 40px;
+	width: 40px;
+	position: absolute;;
+	z-index: 9;
+	right: 20px;
+	top: 80px;
+	background-size: cover;
+}
+
+.mplay{
+	background-image: url(../images/musicon.png); 
+	animation: 1s zhuan infinite linear;
+}
+
+.mpause{
+	background-image: url(../images/musicoff.png);
+}
+
+@keyframes zhuan {
+	0%{
+		transform: rotate(0);
+	}
+
+	100%{
+		transform: rotate(360deg);
+	}
+}
+@media screen and (orientation:landscape) {
+	.wrapper{
+		width: 100vh;
+		height: 100vw;
+		transform: rotate(-90deg);
+		transform-origin: 50vh 50vh;
+	}
+
+	#stage{
+		height: 100%;
+	}
+
+	#stage canvas{
+		height: 100%;
+	}
+}
+
+.ewm{
+	position: absolute;
+	left: 50%;
+	width: 200px;
+	height: 200px;
+	margin-left: -100px;
+	top: 25%;
+	display: none;
+}
+.ewm img{
 	width: 100%;
 }

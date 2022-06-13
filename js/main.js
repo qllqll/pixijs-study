@@ -1,3 +1,58 @@
+/********************** 音频 BEGIN **************/
+//音频播放
+function audioPlay(musicId) {
+	let au = document.getElementById(musicId)
+	au.play()
+	document.addEventListener('WeixinJSBridgeReady', function () {
+		au.play()
+	}, false)
+}
+
+// 暂停
+function audioPause(musicId) {
+	let au = document.getElementById(musicId)
+	au.pause()
+	document.addEventListener('WeixinJSBridgeReady', function () {
+		au.pause()
+	}, false)
+}
+
+
+// 背景音乐默认播放
+audioPlay('bgmusic')
+let audioFlag = true
+function musicAction() {
+	if (audioFlag) {
+		audioPause('bgmusic')
+		audioFlag = false
+		$('#musicIcon').removeClass('mplay').addClass('mpause')
+
+	} else {
+		audioPlay('bgmusic')
+		audioFlag = true
+		$('#musicIcon').removeClass('mpause').addClass('mplay')
+
+	}
+}
+
+document.getElementById('musicIcon').onclick = function () {
+	musicAction()
+}
+
+// 预加载其他声音文件
+setTimeout(() => {
+	audioPlay('ding')
+	audioPause('ding')
+}, 200)
+
+setTimeout(() => {
+	audioPlay('huanhu')
+	audioPause('huanhu')
+}, 200)
+
+/********************** 音频 END **************/
+
+
 /********************** 加载动画素材 BEGIN **************/
 // 加载素材 
 import {
@@ -23,6 +78,8 @@ PIXI.loader
 	.add(p5Arr)
 	.on('progress', function (loader, resource) {
 		// console.log(loader.progress)
+		$('#loadingProgress').html(Math.round(loader.progress) + '%')
+
 	})
 	.load(setup)
 
@@ -36,14 +93,22 @@ let app = null
 
 // setup 函数
 function setup() {
+	// load加载完毕
+	$('#loadingProgress').hide()
+	setTimeout(() => {
+		$('#tip').fadeIn('slow')
+		setTimeout(() => {
+			$('#tip').addClass('upTip')
+		}, 1500);
+	}, 1000);
+
+
 	app = new PIXI.Application({
 		width: 750,
 		height: 1448
 	})
 
 	document.getElementById("stage").appendChild(app.view)
-
-
 
 
 	// 创建精灵组
@@ -102,9 +167,12 @@ function setup() {
 	}
 
 	// 各种滑动
-	touchAction()
 
 	tweenAction()
+	$('#loading').on('touchstart',()=>{
+		$('#loading').hide()
+		touchAction()
+	})
 
 }
 
@@ -146,9 +214,9 @@ function touchAction() {
 		change: function (value) {
 			if ((value <= 0) && (value > maxLong)) {
 				let progress = value / maxLong
-				console.log(value, progress)
 				allTimeline.seek(progress)
 				animationPlay(progress)
+				audioAction(progress)
 			}
 		}
 	})
@@ -198,45 +266,43 @@ function tweenAction() {
 
 	// 音符飘动
 	let yinfu = app.stage.getChildByName('spriteGroupSences').getChildByName('sence2').getChildByName('p2Yinfu')
-	let yinfuStartTime = -2450/maxLong
-	let yinfuDuringTime = -800/maxLong
-	let yinfuTimelne =new TimelineMax({delay:yinfuStartTime})
-	let yinfuTWeen = TweenMax.to(yinfu.position,yinfuDuringTime,{x:3400,y:300})
-	let yinfuTWeen2 = TweenMax.to(yinfu,yinfuDuringTime,{alpha:0})
+	let yinfuStartTime = -2450 / maxLong
+	let yinfuDuringTime = -800 / maxLong
+	let yinfuTimelne = new TimelineMax({ delay: yinfuStartTime })
+	let yinfuTWeen = TweenMax.to(yinfu.position, yinfuDuringTime, { x: 3400, y: 300 })
+	let yinfuTWeen2 = TweenMax.to(yinfu, yinfuDuringTime, { alpha: 0 })
 	yinfuTimelne.add(yinfuTWeen, 0)
 	yinfuTimelne.add(yinfuTWeen2, 0)
 	allTimeline.add(yinfuTimelne, 0)
 
 	// 黑夜缩小窗户
-	let chuang= app.stage.getChildByName('spriteGroupSences').getChildByName('sence3').getChildByName('p32')
-	let chuangStartTime = -2780/maxLong
-	let chuangDuringTime = -800/maxLong
-	let chuangTimeline = new TimelineMax({delay:chuangStartTime})
-	let chuangTween = new TweenMax.from(chuang.position,chuangDuringTime,{x:0,y:-20})
-	let chuangTween2 = TweenMax.from(chuang.scale,chuangDuringTime,{x:5,y:5})
-	chuangTimeline.add(chuangTween,0)
-	chuangTimeline.add(chuangTween2,0)
+	let chuang = app.stage.getChildByName('spriteGroupSences').getChildByName('sence3').getChildByName('p32')
+	let chuangStartTime = -2780 / maxLong
+	let chuangDuringTime = -800 / maxLong
+	let chuangTimeline = new TimelineMax({ delay: chuangStartTime })
+	let chuangTween = new TweenMax.from(chuang.position, chuangDuringTime, { x: 0, y: -20 })
+	let chuangTween2 = TweenMax.from(chuang.scale, chuangDuringTime, { x: 5, y: 5 })
+	chuangTimeline.add(chuangTween, 0)
+	chuangTimeline.add(chuangTween2, 0)
 	allTimeline.add(chuangTimeline, 0)
 
 	// 工作中的小男孩
-	let boyWorking= app.stage.getChildByName('spriteGroupSences').getChildByName('sence3').getChildByName('p31')
-	let bwStartTime = - 2780/maxLong
-	let bwfuDuringTime = -600/maxLong
-	let bwTimeline = new TimelineMax({delay:bwStartTime})
-	let bwTween = TweenMax.to(boyWorking,bwfuDuringTime,{alpha:1})
-	bwTimeline.add(bwTween,0)
-	allTimeline.add(bwTimeline,0)
+	let boyWorking = app.stage.getChildByName('spriteGroupSences').getChildByName('sence3').getChildByName('p31')
+	let bwStartTime = - 2780 / maxLong
+	let bwfuDuringTime = -600 / maxLong
+	let bwTimeline = new TimelineMax({ delay: bwStartTime })
+	let bwTween = TweenMax.to(boyWorking, bwfuDuringTime, { alpha: 1 })
+	bwTimeline.add(bwTween, 0)
+	allTimeline.add(bwTimeline, 0)
 
 	// 旋涡显示
 	let xun = app.stage.getChildByName('spriteGroupLast').getChildByName('bgLast')
-	let xunStartTime = - 6613/maxLong
-	let xunDuringTime = -1000/maxLong
-	let xunTimeline = new TimelineMax({delay:xunStartTime})
-	let xunTween = TweenMax.to(xun,xunDuringTime,{alpha:1})
-	xunTimeline.add(xunTween,0)
-	allTimeline.add(xunTimeline,0)
-
-
+	let xunStartTime = - 6613 / maxLong
+	let xunDuringTime = -1000 / maxLong
+	let xunTimeline = new TimelineMax({ delay: xunStartTime })
+	let xunTween = TweenMax.to(xun, xunDuringTime, { alpha: 1 })
+	xunTimeline.add(xunTween, 0)
+	allTimeline.add(xunTimeline, 0)
 }
 /********************** 时间轴动画 END **************/
 
@@ -247,7 +313,7 @@ function tweenAction() {
 function animationPlay(progress) {
 	// 孩子蹒跚学走路
 	let childStepStartTime = -900 / maxLong
-	let childDuringTime = -1300/ maxLong
+	let childDuringTime = -1300 / maxLong
 
 	if (progress >= childStepStartTime) {
 		let childNum = p2Arr2.length
@@ -258,15 +324,73 @@ function animationPlay(progress) {
 	}
 
 	// 旋涡 扣题
-	let xunStartTime = -6613/maxLong
-	let xunDuringTime = -1000/maxLong
+	let xunStartTime = -6613 / maxLong
+	let xunDuringTime = -1000 / maxLong
 
-	if(progress > xunDuringTime){
+	if (progress > xunDuringTime) {
 		let xunNum = p5Arr.length
-		let xunIndex = Math.floor((progress-xunStartTime)/xunDuringTime*xunNum)
-		if(xunIndex< xunNum && xunIndex >= 0){
+		let xunIndex = Math.floor((progress - xunStartTime) / xunDuringTime * xunNum)
+		if (xunIndex < xunNum && xunIndex >= 0) {
 			app.stage.getChildByName('spriteGroupLast').getChildByName('bgLast').texture = new PIXI.Texture.fromImage(p5Arr[xunIndex])
 		}
 	}
-}
+
+		// 旋涡 扣题
+		let ewmStartTime = -7600 / maxLong
+		if(progress >= ewmStartTime){
+			$('.ewm').show()
+		} else{
+			$('.ewm').hide()
+
+		}
+	}
 /********************** 序列帧 END **************/
+
+
+
+
+
+
+/********************** 加载页 BEGIN **************/
+//加载页
+
+/********************** 加载页 END **************/
+
+
+/********************** 声音 BEGIN **************/
+//声音
+function audioAction(progress) {
+	// 出生
+	let timeDur = 20
+	let auStarStartTime = -40 / maxLong
+	let auStarEndTime = -(40 + timeDur) / maxLong
+	if (progress >= auStarStartTime && progress <= auStarEndTime) {
+		audioPlay('ding')
+	}
+	if (progress <= auStarStartTime) {
+		audioPause('ding')
+	}
+
+	// 欢呼
+	let auHuanhutimeDur = 20
+	let auHuanhuStartTime = -2270 / maxLong
+	let auHuanhuEndTime = -(-2270 + auHuanhutimeDur) / maxLong
+	if (progress >= auHuanhuStartTime && progress <= auHuanhuEndTime) {
+		audioPlay('huanhu')
+	}
+	if (progress <= auHuanhuStartTime) {
+		audioPause('huanhu')
+	}
+}
+
+/********************** 声音 END **************/
+
+
+
+
+
+/********************** 优化 BEGIN **************/
+//优化
+
+/********************** 优化 END **************/
+
